@@ -1,0 +1,687 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Play, 
+  Info, 
+  ChevronLeft, 
+  Clock, 
+  Users, 
+  Gamepad2, 
+  Globe, 
+  ChevronRight,
+  UserCircle
+} from 'lucide-react';
+
+// --- Data Constants ---
+const MEMBERS = [
+  {
+    name: "陳品瑄",
+    dept: "外文三",
+    id: "eileen",
+    childImg: "https://drive.google.com/thumbnail?id=1da6-Hlh0PBrKjWnvPOG3tq0mTHN6if5Y",
+    adultImg: "https://drive.google.com/thumbnail?id=1fcHBvz14twxa2fbCXi5s40jXoud-F__g",
+    mbti: "INFP",
+    intro: "陳品瑄 Eileen Chen 外文系 大三。興趣：看電視，打鼓。專長：開導別人、寫很多字的國文作文。學習目標：可以學習到更多商業相關的知識，練習如何畫coggle，讓自己的英文表達更進步，然後因為平常比較少接觸到電子商業類型的知識，所以想透過這堂課來增加這些相關知識。",
+    mainShowTitle: "混沌少年時",
+    mainShowDesc: "一位13歲少年Jamie Miller 被指控殺害了一位名為Katie Leonard的13歲少女，但他在初期被逮捕時卻堅決不承認自己有殺人的行為，而在後續與心理師諮商的過程中揭露了他與其家人的相處過程，與在青少年間流行的不健康非自願單身(incel)霸凌文化，逐漸揭露出他這起兇殺案的真相。這部劇不單單只殺人案的推理與驚悚，它同時也牽扯到了家庭關係、人際關係、校園管理的各種面向，是一部讓人看完會覺得後勁十足的影集。",
+    jobTitle: "企業開發者平台產品經理",
+    jobContent: "1. 核心工作：建立與優化企業級開發者平台，降低工程師在開發、部署、維運系統時的複雜度，讓工程師能「更快、更穩定、更少摩擦」地交付產品。負責讓 Netflix 的工程師「好工作」。2. 產品與策略層面的工作：制定長期平台產品願景與策略，規劃平台 roadmap。3. 開發者體驗：優化工程師在 build、deploy、debug、maintain 系統時的流程，減少重複設定。4. AI 與平台整合：將 AI 能力整合進開發者工具與工作流程。5. 跨團隊推動：與多個工程團隊合作。6. 對高層溝通：撰寫邏輯清晰的策略文件。",
+    jobLink: "我是陳品瑄，外文系大三學生。在修習「商業時事分析」這門課程時，我嘗試從非商管背景出發，理解企業如何透過不同商業框架與角色分工，提升整體競爭力與運作效率。在分析 Netflix 的職位「企業開發者平台產品經理」時，我發現這個角色正好能串聯課堂中所學的多個商業概念。首先，從企業開發者平台產品經理的角度來看，這個角色的核心任務並非直接創造營收，而是透過平台與流程設計，提升內部工程師的工作效率。這樣的決策本質上是一種商業判斷：企業選擇將資源投入在「提升內部生產力」，以間接強化長期競爭力。這讓我理解到，商業模式不只存在於對外市場，也存在於企業內部的運作設計之中。",
+    video: "https://www.youtube.com/embed/BwAA-ObT3XM"
+  },
+  {
+    name: "張鈞傑",
+    dept: "管學二",
+    id: "jefree",
+    childImg: "https://drive.google.com/thumbnail?id=1XXf6XPczAiuPY5-gY2eCrBnCcjcl_jEL",
+    adultImg: "https://drive.google.com/thumbnail?id=1OK_NXnv0sT-LDo4PyJtHy8BFgD-zcLxf",
+    mbti: "ENFJ",
+    intro: "名字：張鈞傑 Jefree Chang。系級：管理學士學系 大二。興趣：聽音樂（the 1975)，看電影（Netflix），聽獨立樂團（國內外都聽），溜滑板，看星星。專長：有耐心，會寫企劃，寫詩。學習目標：希望能在本課程獲得滿滿的知識以及商業時事分析的能力。",
+    mainShowTitle: "怪奇物語",
+    mainShowDesc: "故事背景設定在1980年代的美國印第安納州一個名為霍金斯（Hawkins）的小鎮。表面上，這是一個典型的美國中西部城鎮，然而在平靜之下，政府祕密計畫與未知力量正悄悄運作。霍金斯國家實驗室的實驗失控意外打開了一個通往異次元世界的通道，稱為「顛倒世界」。這不只是一個怪物的故事，更是一個關於友情、勇氣與人性，在未知威脅下被迫成長的故事。",
+    jobTitle: "機器學習架構產品經理（廣告平台）",
+    jobContent: "主導可組合式機器學習基礎架構的開發與管理。這是一個「為開發者打造的平台」的角色，負責奠定基礎，讓來自工程、產品、資料科學、銷售與營運等團隊的優秀同仁能在此架構之上發揮最大影響力。工作包含：定義共享機器學習架構端到端產品願景、交付 API/SDK/UI 平台、與法務團隊合作隱私標準、與設計團隊設計智慧代理（agents）工作流、整合第三方應用程式。",
+    jobLink: "我的名字是張鈞傑，就讀管理學士學系大二。從這個職缺中，我看見一個高度符合我個人特質與學習目標的角色輪廓。這個職位的核心是「為他人打造系統」，這與我「有耐心、擅長寫企劃、喜歡整合想法」的特質高度契合。此外，我平時對音樂、電影與獨立文化的熱愛，讓我對使用者體驗特別敏感，正好能發揮在該職位強調的體驗設計上。在商業模式上，這讓我理解到好的 B2B 產品必須嵌入對方的工作流程中，降低轉換成本。",
+    video: "https://www.youtube.com/embed/XSvrjo80iTs"
+  },
+  {
+    name: "張家維",
+    dept: "管學二",
+    id: "jerry",
+    childImg: "https://drive.google.com/thumbnail?id=13q-rxJePZ2b-GSRTdh1VAg32UcUHbiJu",
+    adultImg: "https://drive.google.com/thumbnail?id=1l2CujD8MzYGETsEmL0zBCYJ8aqjuh2mE",
+    mbti: "ENFJ",
+    intro: "大家好，我是張家維 Jerry，目前就讀管理學院學士班二年級。我喜歡打羽球、桌球，也熱衷志工與學生自治相關工作。現任學生會秘書長、系學會秘書與勞動部青年職涯大使。我希望透過商業時事分析課程增進英文能力，也加強商業模式九宮格等專業知識，為未來創業或行銷領域做好準備。",
+    mainShowTitle: "影后",
+    mainShowDesc: "重點在於多角度描繪演藝圈女性的真實困境，藉由三代女演員的浮沉人生，探討她們在親情、愛情、友情與自我價值上的掙扎，展現女性在社會角色與職業身份下的複雜人性。故事核心是關於「關係」的變質與修復，揭露光鮮背後的殘酷與溫暖，最終呈現每個人都是自己人生的影后。",
+    jobTitle: "產品經理（商業成長）",
+    jobContent: "1. 核心工作：制定並執行站外獲客與商業成長策略，加速表現不佳市場的用戶轉換。2. 產品與策略：維護產品 roadmap，負責從構想到上線的完整週期。3. 用戶流程：設計站外用戶流程，串接搜尋引擎、社群平台至 Netflix 站內體驗。4. 實驗優化：執行 A/B Testing 優化獲客效率。5. 跨團隊推動：與行銷、數據、設計團隊協作。",
+    jobLink: "我是張家維，就讀管理學院學士班大二。分析此職缺時，我發現該角色能清楚連結課堂中對價值創造與效率的討論。核心任務是優化使用者從站外到完成訂閱的轉換流程。從商業角度看，這是一種以流程與策略設計來放大成長效率的決策。這讓我理解到，商業模式不只存在於產品本身，也體現在流程與決策設計之中。我習慣將模糊想法整理為可執行方案，透過此職位的分析，我學習以產品經理視角理解企業如何創造長期價值。",
+    video: "https://www.youtube.com/embed/jZzVNDmewsw"
+  },
+  {
+    name: "鍾孟軒",
+    dept: "國企二",
+    id: "dylan",
+    childImg: "https://drive.google.com/thumbnail?id=1WzOkLyxLZvwr-9wCFhlcfl3mXohcqnam",
+    adultImg: "https://drive.google.com/thumbnail?id=1gmXLi5ea3W4kQrFRRWqOV_AEDSrChR2Y",
+    mbti: "INFJ",
+    intro: "鍾孟軒 Dylan Laurent 國際企業學系 大二。興趣：打籃球，看電影。專長：我常常烘焙。學習目標：Study more and understand the material maximumly.",
+    mainShowTitle: "紅色通緝令 (Red Notice)",
+    mainShowDesc: "這是一部美國動作喜劇片，故事以全球藝術品盜竊為核心展開。FBI頂尖犯罪側寫師約翰·哈特利被迫與世界排名第二的藝術大盜諾蘭·布斯合作，為了抓住真正的頭號竊賊「主教」。旅途中充滿機關、謊言與反轉，主角們必須在互相利用與建立信任之間取得平衡。",
+    jobTitle: "產品經理－銷售產品",
+    jobContent: "制定並塑造數據策略，作為 Netflix 理解廣告主與銷售表現的核心基礎。主導數據品質與資料治理，包含帳戶驗證、指標基準與成效歸因。優化市場進入架構，建立連續需求循環。將 AI 代理系統導入銷售流程。與銷售、工程、法務等團隊密切合作。該職位年薪範圍為 12 萬至 51 萬 5 千美元。",
+    jobLink: "我目前就讀於國際企業學系大二，對企業如何在全球市場中運用數據與策略創造競爭優勢感興趣。Netflix 的廣告銷售產品涉及跨市場經營與商業模式調整，這與國企系所學高度相關。我身為 INFJ，重視系統思考與長期影響，這與職位強調的資料治理契合。而我的烘焙專長也讓我極度重視流程與細節，正如高品質數據對銷售系統的重要性。",
+    video: "https://www.youtube.com/embed/E4AaqCkXyaE"
+  },
+  {
+    name: "吳益良",
+    dept: "管學五",
+    id: "ricky",
+    childImg: "https://drive.google.com/thumbnail?id=1Rnx3ESzvq39iMjo4Z7LHVVdFCcSblnfv",
+    adultImg: "https://drive.google.com/thumbnail?id=1cAXqVovwONs9QpF6URtTh5cbyJxT1YsO",
+    mbti: "ENTJ",
+    intro: "吳益良 Ricky 管理學士學系 大五。興趣：我對羽毛球很感興趣。專長：我的專長是公開演講。學習目標：是更深入了解我的專題。",
+    mainShowTitle: "魷魚遊戲",
+    mainShowDesc: "這是一部韓國驚悚影集，故事圍繞一群正面臨經濟困境與人生危機的成年人展開。他們收到神祕邀請，參加一系列童年遊戲，只要獲勝就能得到龐大獎金。然而，當比賽開始後，參賽者才發現輸掉比賽的代價是立刻失去生命。這部劇深刻探討了金錢與人性的衝突。",
+    jobTitle: "產品經理 (內容工程)",
+    jobContent: "吳益良同學負責分析內容工程領域。致力於提升 Netflix Studio 的製作效率，透過數據驅動的工具支持內容提案與發佈流程，目標是為創作者提供高度個人化的工具體驗。",
+    jobLink: "吳益良同學作為 ENTJ，具備領導特質與對目標的高度專注。透過分析魷魚遊戲的成功，他學習到如何從商業角度評估內容生產的風險與回報。他將公開演講的專長應用於職位中的跨部門溝通，理解產品經理如何將技術語言轉化為業務目標。",
+    video: "https://www.youtube.com/embed/I-Am3K_Gq0o"
+  }
+];
+
+const TRANSLATIONS = {
+  zh: {
+    signin: "登入",
+    email: "電子郵件或手機號碼",
+    password: "密碼",
+    needHelp: "需要幫助？",
+    newToNetflix: "Netflix 新會員？",
+    signupNow: "立即訂閱。",
+    learnMore: "點我解鎖更多",
+    language: "中文",
+    home: "首頁",
+    timeline: "Netflix 發展時間軸",
+    warner: "華納夥伴",
+    quiz: "靈魂片單",
+    companyIntro: "公司簡介",
+    jobDesc: "職位說明",
+    benefit: "福利與理念",
+    teamOverview: "團隊總覽",
+    backToLogin: "登出"
+  },
+  en: {
+    signin: "Sign In",
+    email: "Email or phone number",
+    password: "Password",
+    needHelp: "Need help?",
+    newToNetflix: "New to Netflix?",
+    signupNow: "Sign up now.",
+    learnMore: "Click to Unlock More",
+    language: "English",
+    home: "Home",
+    timeline: "Netflix Timeline",
+    warner: "Warner Partner",
+    quiz: "Soul Watchlist",
+    companyIntro: "Company Intro",
+    jobDesc: "Job Description",
+    benefit: "Benefits & Philosophy",
+    teamOverview: "Team Overview",
+    backToLogin: "Logout"
+  },
+  id: {
+    signin: "Masuk",
+    email: "Email atau nomor telepon",
+    password: "Kata sandi",
+    needHelp: "Butuh bantuan?",
+    newToNetflix: "Baru di Netflix?",
+    signupNow: "Daftar sekarang.",
+    learnMore: "Klik untuk Membuka Lebih Lanjut",
+    language: "Indonesia",
+    home: "Beranda",
+    timeline: "Linimasa Netflix",
+    warner: "Mitra Warner",
+    quiz: "Daftar Tontonan Jiwa",
+    companyIntro: "Profil Perusahaan",
+    jobDesc: "Deskripsi Pekerjaan",
+    benefit: "Manfaat & Filosofi",
+    teamOverview: "Ikhtisar Tim",
+    backToLogin: "Keluar"
+  },
+  cg: {
+    signin: "Kokoti",
+    email: "Email to nimero ya telefone",
+    password: "Liloba ya sekele",
+    needHelp: "Olingi lisungi?",
+    newToNetflix: "Sika na Netflix?",
+    signupNow: "Mikomisa sikoyo.",
+    learnMore: "Tinya mpo na kofungola mingi",
+    language: "Kongo",
+    home: "Ndako",
+    timeline: "Tango ya Netflix",
+    warner: "Partner Warner",
+    quiz: "Liste ya Soul",
+    companyIntro: "Kompanyi",
+    jobDesc: "Mosala",
+    benefit: "Matomba",
+    teamOverview: "Ekipi",
+    backToLogin: "Bima"
+  }
+};
+
+const TIMELINE_DATA = [
+  { year: "2002", event: "Netflix 公司上市（Went public）。" },
+  { year: "2009", event: "發布《Netflix 文化：自由與責任》簡報，被譽為「矽谷最有價值文件」。" },
+  { year: "2011", event: "全球訂閱用戶數經歷下滑，隨後進行策略調整。" },
+  { year: "2013", event: "開始製作原創內容，推出《紙牌屋》等影集。" },
+  { year: "2015", event: "總訂戶數來到 7,476 萬，成長快速。" },
+  { year: "2016", event: "擴展至全球 130 個國家，包含台灣。" },
+  { year: "2019", event: "串流影音市場市佔率達 48%。" },
+  { year: "2020", event: "宣布計畫每週上架一部新的電影。" },
+  { year: "2021", event: "《魷魚遊戲》成商最高成功作品，帶來 9 億美元價值。" },
+  { year: "2022", event: "面臨競爭加劇，首季用戶下滑 20 萬。隨後推出廣告方案。" },
+  { year: "2023", event: "取締共享帳戶，Q2 新增近 600 萬用戶。" },
+  { year: "2024", event: "含廣告方案吸引 2300 萬用戶，股價大漲 83%。" },
+  { year: "2025", event: "預計播出《WWE Raw》，開拓廣告與新用戶市場。" }
+];
+
+const QUIZ_QUESTIONS = [
+  {
+    q: "1. 此刻你打開 Netflix 的心情最接近？",
+    options: [
+      { t: "(A) 輕鬆不動腦", score: { light: 1 } },
+      { t: "(B) 渴望刺激", score: { thriller: 1 } },
+      { t: "(C) 探索人性", score: { drama: 1 } },
+      { t: "(D) 好奇新知", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "2. 你理想的「追劇零食」會是什麼？",
+    options: [
+      { t: "(A) 甜點或冰淇淋", score: { light: 1 } },
+      { t: "(B) 辣炸雞配啤酒", score: { thriller: 1 } },
+      { t: "(C) 紅酒慢慢品味", score: { drama: 1 } },
+      { t: "(D) 經典爆米花", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "3. 如果讓你進入一個影視世界生活，你選？",
+    options: [
+      { t: "(A) 都市粉紅泡泡", score: { light: 1 } },
+      { t: "(B) 末日廢土", score: { thriller: 1 } },
+      { t: "(C) 復古宮廷", score: { drama: 1 } },
+      { t: "(D) 科幻未來", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "4. 關於「燒腦」程度，你的接受度是？",
+    options: [
+      { t: "(A) 完全不想動腦", score: { light: 1 } },
+      { t: "(B) 喜歡反轉驚訝", score: { thriller: 1 } },
+      { t: "(C) 細節控、隱喻控", score: { drama: 1 } },
+      { t: "(D) 合理就好", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "5. 你對影集的「長短」有偏好嗎？",
+    options: [
+      { t: "(A) 長篇大論多季", score: { drama: 1 } },
+      { t: "(B) 精簡迷你劇", score: { thriller: 1 } },
+      { t: "(C) 電影一次解決", score: { doc: 1 } },
+      { t: "(D) 沒差，好看就好", score: { light: 1 } }
+    ]
+  },
+  {
+    q: "6. 當你看到角色遇到危機時？",
+    options: [
+      { t: "(A) 捂眼不敢看", score: { light: 1 } },
+      { t: "(B) 興奮分析脫困", score: { thriller: 1 } },
+      { t: "(C) 感同身受大哭", score: { drama: 1 } },
+      { t: "(D) 觀察運鏡特效", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "7. 視覺風格上你更喜歡？",
+    options: [
+      { t: "(A) 繽紛明亮", score: { light: 1 } },
+      { t: "(B) 陰暗冷色調", score: { thriller: 1 } },
+      { t: "(C) 優雅唯美", score: { drama: 1 } },
+      { t: "(D) 寫實紀錄感", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "8. 哪種元素最吸引你？",
+    options: [
+      { t: "(A) 浪漫擁吻", score: { light: 1 } },
+      { t: "(B) 高智商犯罪", score: { thriller: 1 } },
+      { t: "(C) 心理療癒", score: { drama: 1 } },
+      { t: "(D) 宏大宇宙觀", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "9. 你追劇最怕遇到什麼「雷點」？",
+    options: [
+      { t: "(A) 太沉重鬱卒", score: { light: 1 } },
+      { t: "(B) 邏輯不通降智", score: { thriller: 1 } },
+      { t: "(C) 節奏拖泥帶水", score: { drama: 1 } },
+      { t: "(D) 結局爛尾", score: { doc: 1 } }
+    ]
+  },
+  {
+    q: "10. 你的 Netflix 頭像選擇？",
+    options: [
+      { t: "(A) 可愛動畫", score: { light: 1 } },
+      { t: "(B) 英雄特務", score: { thriller: 1 } },
+      { t: "(C) 文藝經典", score: { drama: 1 } },
+      { t: "(D) 預設色塊", score: { doc: 1 } }
+    ]
+  }
+];
+
+export default function App() {
+  const [view, setView] = useState('login'); // login, home, member, timeline, warner, quiz
+  const [lang, setLang] = useState('zh');
+  const [activeMember, setActiveMember] = useState(null);
+  const [timelineIndex, setTimelineIndex] = useState(0);
+  const [quizState, setQuizState] = useState({ active: false, step: 0, scores: { light: 0, thriller: 0, drama: 0, doc: 0 }, result: null });
+
+  const t = TRANSLATIONS[lang];
+
+  // Helper to get results
+  const calculateResult = () => {
+    const scores = quizState.scores;
+    const max = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+    
+    if (max === 'light') return ["黑鏡：驚奇故事", "愛x死x機器人", "性愛自修室"];
+    if (max === 'thriller') return ["魷魚遊戲", "紙房子", "怪奇物語"];
+    if (max === 'drama') return ["影后", "黑暗榮耀", "后翼棄兵"];
+    return ["奧本海默", "我們的星球", "一級玩家"];
+  };
+
+  const handleNextQuiz = (score) => {
+    const nextScores = { ...quizState.scores };
+    Object.keys(score).forEach(key => nextScores[key] += score[key]);
+    
+    if (quizState.step < QUIZ_QUESTIONS.length - 1) {
+      setQuizState({ ...quizState, step: quizState.step + 1, scores: nextScores });
+    } else {
+      const results = calculateResult();
+      setQuizState({ ...quizState, active: false, result: results });
+    }
+  };
+
+  if (view === 'login') {
+    return (
+      <div className="min-h-screen bg-black text-white relative font-sans overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 opacity-50 bg-[url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6bc173c-2794-49c7-9e0c-c60f2a969963/TW-zh-20220502-popsignuptw-perspective_alpha_website_small.jpg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
+        
+        {/* Navbar */}
+        <nav className="relative z-10 p-8 flex justify-between items-center max-w-7xl mx-auto">
+          <h1 className="text-red-600 font-black text-4xl tracking-tighter">KNOW YOUR FILM</h1>
+          <div className="flex gap-4 items-center">
+            <div className="relative">
+              <select 
+                value={lang} 
+                onChange={(e) => setLang(e.target.value)}
+                className="bg-black/80 border border-gray-600 rounded px-4 py-1 flex items-center gap-2 appearance-none focus:outline-none pr-8"
+              >
+                <option value="zh">繁體中文</option>
+                <option value="en">English</option>
+                <option value="id">Indonesia</option>
+                <option value="cg">Kongo</option>
+              </select>
+              <Globe size={14} className="absolute right-2 top-2.5 pointer-events-none" />
+            </div>
+            <button 
+              onClick={() => setView('home')}
+              className="bg-red-600 hover:bg-red-700 px-6 py-1.5 rounded text-sm font-medium transition"
+            >
+              {t.signin}
+            </button>
+          </div>
+        </nav>
+
+        {/* Login Card */}
+        <div className="relative z-10 flex justify-center pt-20">
+          <div className="bg-black/75 p-16 rounded-lg w-full max-w-md">
+            <h2 className="text-3xl font-bold mb-8">{t.signin}</h2>
+            <div className="space-y-4">
+              <input type="text" placeholder={t.email} className="w-full bg-[#333] rounded p-4 text-sm outline-none" />
+              <input type="password" placeholder={t.password} className="w-full bg-[#333] rounded p-4 text-sm outline-none" />
+              <button 
+                onClick={() => setView('home')}
+                className="w-full bg-red-600 py-3 rounded font-bold text-sm mt-8"
+              >
+                {t.signin}
+              </button>
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-4">
+              <label className="flex items-center gap-2"><input type="checkbox" /> 記住我</label>
+              <a href="#">{t.needHelp}</a>
+            </div>
+            <div className="mt-20 text-gray-500">
+              {t.newToNetflix} <span className="text-white hover:underline cursor-pointer">{t.signupNow}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#141414] text-white font-sans scroll-smooth">
+      {/* Sidebar/Nav */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-4 transition-all duration-300">
+        <div className="max-w-7xl mx-auto flex items-center gap-8">
+          <h1 className="text-red-600 font-black text-2xl cursor-pointer tracking-tighter" onClick={() => {setView('home'); setQuizState({...quizState, result: null})}}>KNOW YOUR FILM</h1>
+          <div className="flex gap-6 text-sm text-gray-300">
+            <button onClick={() => setView('home')} className="hover:text-white transition">首頁</button>
+            <button onClick={() => setView('timeline')} className="hover:text-white transition">發展時間軸</button>
+            <button onClick={() => setView('warner')} className="hover:text-white transition">華納夥伴</button>
+            <button onClick={() => setQuizState({...quizState, active: true, step: 0, scores: { light: 0, thriller: 0, drama: 0, doc: 0 }})} className="hover:text-white transition">靈魂片單測驗</button>
+          </div>
+          <div className="ml-auto flex items-center gap-4">
+             <button onClick={() => setView('login')} className="text-xs border border-gray-600 px-3 py-1 rounded hover:bg-white/10">{t.backToLogin}</button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content Areas */}
+      <div className="pt-24 pb-20">
+        {view === 'home' && (
+          <div className="max-w-7xl mx-auto px-8">
+            {/* Intro Section */}
+            <div className="mb-16">
+              <h2 className="text-4xl font-bold mb-8">Welcome to the Film Industry</h2>
+              <div className="grid md:grid-cols-2 gap-12 text-gray-300 leading-relaxed text-sm">
+                <div className="space-y-6">
+                  <section>
+                    <h3 className="text-white font-bold text-lg mb-2">{t.companyIntro}</h3>
+                    <p>
+                      Netflix 是全球領先的娛樂服務平台之一，在超過 190 個國家擁有超過 3 億名付費會員，提供多元語言與類型的影集、電影與遊戲內容。會員可以隨時、隨地、無限制地觀看、暫停或繼續播放，也能依需求隨時調整方案。隨著我們在全球持續成長，我們有越來越多機會以嶄新的方式與現有會員及潛在會員溝通，並帶來驚喜。我們相信，商業成長來自於設計無摩擦的服務外使用旅程、優化跨通路的用戶取得與回流訊息，以及在表現較弱的市場中開創新機會。
+                    </p>
+                  </section>
+                  <section>
+                    <h3 className="text-white font-bold text-lg mb-2">{t.jobDesc}: 產品經理（商業成長）</h3>
+                    <p>
+                      作為商業成長產品經理，你將負責制定策略，加速表現較弱市場的成長，並與行銷、直播（Live）、遊戲（Games）及各地區團隊密切合作，規劃並執行針對在地受眾的高影響力實驗。工作內容包含優化再行銷與回流用戶訊息流程，以提升轉換率；同時主導創新的服務外用戶取得與互動策略，塑造從 Google、生成式 AI 服務及其他平台等外部管道進入 Netflix 的使用者旅程。作為產品經理，你需要負責專案的設計、策略規劃、執行與優先順序安排。你必須能在快速變動的環境中，與跨職能專家密切合作。
+                    </p>
+                  </section>
+                </div>
+                <div className="space-y-6">
+                  <section>
+                    <h3 className="text-white font-bold text-lg mb-2">{t.benefit}</h3>
+                    <p>
+                      在個人生活方面，我們不認為應該由公司來決定你重視什麼。我們相信，提供適當的資源能減少外在干擾，讓你能專注於發揮最佳表現。歡迎參考我們的「工作與生活理念」，了解如何在 Netflix 照顧好自己。我們不設獎金制度，員工每年可自行選擇薪酬中以現金薪資或股票選擇權的比例，公司會依據市場指標，決定市場區間中的個人薪酬水準。
+                    </p>
+                  </section>
+                  <section>
+                    <h3 className="text-white font-bold text-lg mb-2">Netflix 產品經理團隊工作總覽</h3>
+                    <p>
+                      產品管理團隊負責規劃會員與非會員如何與 Netflix 服務互動，以及內容創作者如何與 Netflix Studio 合作。其中，消費者產品管理團隊負責會員與非會員在多個領域的使用體驗，包括商業、廣告與遊戲。內容與商業產品團隊則負責開發工具與產品，支援 Netflix 內容的提案、製作與發佈。該團隊致力於改善多元裝置生態系中的使用體驗，目標是為會員與內容創作者提供高度個人化且令人驚喜的體驗。
+                    </p>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Access Buttons */}
+            <div className="flex flex-wrap gap-4 mb-20 justify-center">
+              <button 
+                onClick={() => setView('timeline')}
+                className="group relative h-40 w-64 rounded-md overflow-hidden bg-zinc-900 border border-zinc-800 transition transform hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-70" />
+                <img src="https://drive.google.com/thumbnail?id=1RoVswFp1vrgMn-8ti65qZakd3PYNCdL3" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-4 left-4 z-20 font-bold flex items-center gap-2">
+                  <Clock size={18} /> Netflix 發展時間軸
+                </div>
+              </button>
+              <button 
+                onClick={() => setView('warner')}
+                className="group relative h-40 w-64 rounded-md overflow-hidden bg-zinc-900 border border-zinc-800 transition transform hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-70" />
+                <img src="https://drive.google.com/thumbnail?id=1tPgHgAm6rNXR94gFT-2bN2EalyRtZxxx" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-4 left-4 z-20 font-bold flex items-center gap-2">
+                  <Users size={18} /> 華納夥伴
+                </div>
+              </button>
+              <button 
+                onClick={() => setQuizState({...quizState, active: true, step: 0})}
+                className="group relative h-40 w-64 rounded-md overflow-hidden bg-zinc-900 border border-zinc-800 transition transform hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-70" />
+                <img src="https://drive.google.com/thumbnail?id=1dn5JwtZPofn8-kXHmGSvDKZjQFRfPMJ7" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-4 left-4 z-20 font-bold flex items-center gap-2">
+                  <Gamepad2 size={18} /> 靈魂片單
+                </div>
+              </button>
+            </div>
+
+            {/* Whos Watching / Member List */}
+            <div className="text-center mb-12">
+              <h3 className="text-4xl text-gray-200 mb-8">點我解鎖更多</h3>
+              <div className="flex flex-wrap justify-center gap-8">
+                {MEMBERS.map(m => (
+                  <div key={m.id} className="group cursor-pointer w-40" onClick={() => {setActiveMember(m); setView('member');}}>
+                    <div className="relative aspect-square rounded-md overflow-hidden mb-4 border-4 border-transparent group-hover:border-white transition">
+                      <img src={m.childImg} alt={m.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="text-gray-400 group-hover:text-white transition font-medium">
+                      <p className="text-lg">{m.name}</p>
+                      <p className="text-xs uppercase opacity-70">{m.dept}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view === 'member' && activeMember && (
+          <div className="max-w-7xl mx-auto px-8">
+            <button onClick={() => setView('home')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8">
+              <ChevronLeft /> 返回總覽
+            </button>
+            
+            <div className="grid md:grid-cols-[300px_1fr] gap-12">
+              {/* Profile Sidebar */}
+              <div className="space-y-6">
+                <div className="rounded-lg overflow-hidden aspect-square border-2 border-zinc-800 bg-zinc-900">
+                  <img src={activeMember.adultImg} alt={activeMember.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                  <h3 className="text-2xl font-bold mb-1">{activeMember.name}</h3>
+                  <p className="text-red-500 font-bold mb-4">{activeMember.dept}</p>
+                  <p className="text-sm text-gray-400 mb-4">{activeMember.intro}</p>
+                  <div className="bg-red-600/20 text-red-400 px-3 py-1 rounded-full text-center font-bold">
+                    MBTI: {activeMember.mbti}
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Info */}
+              <div className="space-y-12">
+                <section className="bg-zinc-900/30 p-8 rounded-xl border border-zinc-800">
+                  <h4 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                    <Play size={20} className="fill-current" /> 我的主片單：{activeMember.mainShowTitle}
+                  </h4>
+                  <p className="text-gray-300 leading-relaxed text-sm">{activeMember.mainShowDesc}</p>
+                </section>
+
+                <section className="bg-zinc-900/30 p-8 rounded-xl border border-zinc-800">
+                  <h4 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                    <Info size={20} /> 職位分析：{activeMember.jobTitle}
+                  </h4>
+                  <div className="space-y-6 text-sm">
+                    <div className="text-gray-300">
+                      <h5 className="text-white font-bold mb-2">產品經理工作內容</h5>
+                      <p className="whitespace-pre-line leading-relaxed">{activeMember.jobContent}</p>
+                    </div>
+                    <div className="text-gray-300 border-t border-zinc-800 pt-6">
+                      <h5 className="text-white font-bold mb-2">工作內容與角色連結</h5>
+                      <p className="whitespace-pre-line leading-relaxed">{activeMember.jobLink}</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                  <h4 className="text-xl font-bold text-white">DID 影片</h4>
+                  <div className="aspect-video w-full rounded-xl overflow-hidden bg-black border border-zinc-800 shadow-2xl">
+                    <iframe 
+                      className="w-full h-full"
+                      src={activeMember.video}
+                      title="DID影片"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view === 'timeline' && (
+          <div className="max-w-4xl mx-auto px-8">
+            <button onClick={() => setView('home')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8">
+              <ChevronLeft /> 返回總覽
+            </button>
+            <h2 className="text-3xl font-bold mb-8 text-red-500 italic">Netflix STRANGER THINGS Timeline</h2>
+            
+            {/* ST Style Timeline */}
+            <div className="relative pl-12 border-l-2 border-red-600 space-y-8 py-10">
+              {TIMELINE_DATA.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className={`relative cursor-pointer transition p-4 rounded group ${timelineIndex === idx ? 'bg-red-950/30 border border-red-900 shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'hover:bg-zinc-900/50'}`}
+                  onClick={() => setTimelineIndex(idx)}
+                >
+                  <div className={`absolute -left-16 top-6 w-8 h-8 rounded-full border-2 border-red-600 flex items-center justify-center font-bold text-xs bg-black ${timelineIndex === idx ? 'bg-red-600 scale-125 transition' : ''}`}>
+                    {item.year.slice(-2)}
+                  </div>
+                  <h4 className={`text-xl font-bold mb-2 ${timelineIndex === idx ? 'text-red-500' : 'text-gray-500'}`}>{item.year}</h4>
+                  <p className={`${timelineIndex === idx ? 'text-gray-200' : 'text-gray-600'} text-sm`}>
+                    {timelineIndex === idx ? item.event : '點擊展開詳情...'}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 bg-zinc-900 p-8 rounded-xl border border-zinc-800">
+               <h3 className="text-xl font-bold mb-4">Netflix 關鍵營運模式與技術發展</h3>
+               <p className="text-sm text-gray-400 leading-relaxed space-y-4">
+                 除了上述時間點事蹟外，Netflix 的成功也歸功於其持續發展的技術和商業模式：<br/><br/>
+                 <strong>商業模式轉型：</strong> Netflix 採取訂閱服務模式，透過收取會員訂閱費營利，提供隨時隨地的網路視頻觀看服務。其內容策略是以原創內容為主，外購內容為輔。<br/><br/>
+                 <strong>推薦系統：</strong> 研發了一套創新的個人化推薦系統，協助用戶輕鬆找到可能感興趣的內容。系統會根據您的觀影記錄、評分、與您有類似喜好的會員進行評估。<br/><br/>
+                 <strong>影音製作現代化 (Netflix Studio)：</strong> 成立了製片工作室，發展出「Pitch to Play」流程。運用機器學習分析劇本結構、自動估算拍攝時間成本，以及建立視覺特效拍攝分類器來評估製作複雜度和預估花費。
+               </p>
+            </div>
+          </div>
+        )}
+
+        {view === 'warner' && (
+          <div className="max-w-4xl mx-auto px-8">
+            <button onClick={() => setView('home')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8">
+              <ChevronLeft /> 返回總覽
+            </button>
+            <h2 className="text-3xl font-bold mb-8">華納夥伴分析</h2>
+            <div className="rounded-xl overflow-hidden mb-12 border border-zinc-800 shadow-2xl">
+               <img src="https://drive.google.com/thumbnail?id=1tPgHgAm6rNXR94gFT-2bN2EalyRtZxxx" className="w-full" alt="Warner Analysis" />
+            </div>
+            <div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800 text-sm leading-relaxed text-gray-300">
+              <h3 className="text-xl font-bold text-white mb-4">華納與網飛合併消息分析</h3>
+              <p>
+                近期關於華納兄弟探索 (Warner Bros. Discovery) 與 Netflix 的併購傳聞或深度合作消息引發了業界熱議。我們可以使用 <strong>價值鏈分析 (Value Chain Analysis)</strong> 或 <strong>競爭力分析 (Five Forces Model)</strong> 來解釋此現象。
+                <br/><br/>
+                從商業模式的角度來看，此現象可視為「內容資源與通路平台的深度整合」。華納擁有世界頂級的 IP 資源（如 DC、哈利波特、權力遊戲），而 Netflix 擁有最強大的串流通路與用戶數據庫。這種併購或整合本質上是為了在競爭日益激烈的市場中（對抗 Disney+ 與 Apple TV+）建立絕對的競爭優勢。
+                <br/><br/>
+                這種趨勢體現了串流媒體下半場的戰略重點：從「單純用戶獲取」轉向「內容資產的最優化利用」。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Quiz Modal Overlays */}
+        {quizState.active && (
+          <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+            <div className="bg-zinc-900 max-w-2xl w-full p-8 rounded-2xl border border-zinc-800 relative overflow-hidden">
+              <div className="absolute top-0 left-0 h-1 bg-red-600 transition-all duration-500" style={{ width: `${((quizState.step + 1) / QUIZ_QUESTIONS.length) * 100}%` }} />
+              
+              <div className="mb-8">
+                <span className="text-red-500 font-bold text-sm uppercase tracking-widest">Question {quizState.step + 1} of 10</span>
+                <h3 className="text-2xl font-bold mt-2">{QUIZ_QUESTIONS[quizState.step].q}</h3>
+              </div>
+              
+              <div className="grid gap-3">
+                {QUIZ_QUESTIONS[quizState.step].options.map((opt, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handleNextQuiz(opt.score)}
+                    className="w-full text-left p-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition flex items-center justify-between group"
+                  >
+                    <span>{opt.t}</span>
+                    <ChevronRight className="opacity-0 group-hover:opacity-100 transition" />
+                  </button>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => setQuizState({ ...quizState, active: false })}
+                className="mt-8 text-xs text-gray-500 hover:text-white transition underline"
+              >
+                放棄測驗
+              </button>
+            </div>
+          </div>
+        )}
+
+        {quizState.result && (
+          <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+            <div className="bg-zinc-900 max-w-2xl w-full p-12 rounded-2xl border border-zinc-800 text-center animate-in fade-in zoom-in duration-500">
+              <div className="w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Play className="text-red-600 fill-current" size={32} />
+              </div>
+              <h2 className="text-3xl font-bold mb-2">測驗結果揭曉！</h2>
+              <p className="text-gray-400 mb-8">根據您的回答，我們為您推薦以下 Netflix 專屬片單：</p>
+              
+              <div className="space-y-4 mb-10">
+                {quizState.result.map((item, i) => (
+                  <div key={i} className="bg-zinc-800 p-4 rounded-xl border border-zinc-700 font-bold text-xl flex items-center gap-4">
+                    <span className="bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">{i+1}</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => setQuizState({ ...quizState, result: null })}
+                className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition"
+              >
+                返回首頁探索
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-800 py-10 text-gray-500 text-xs mt-20">
+        <div className="max-w-7xl mx-auto px-8">
+          <p className="mb-4">有疑問嗎？請致電 0800-000-000</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <a href="#" className="hover:underline">常見問題</a>
+            <a href="#" className="hover:underline">隱私權中心</a>
+            <a href="#" className="hover:underline">使用條款</a>
+            <a href="#" className="hover:underline">聯絡我們</a>
+          </div>
+          <p>© 2024 Know Your Film - Group Project</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
